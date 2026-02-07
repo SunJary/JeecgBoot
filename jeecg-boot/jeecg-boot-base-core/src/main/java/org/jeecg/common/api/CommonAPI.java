@@ -124,6 +124,8 @@ public interface CommonAPI {
      */
     List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code);
 
+    List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code, String dataSource);
+
     /**
      * 14 普通字典的翻译，根据多个dictCode和多条数据，多个以逗号分割
      * @param dictCodes 例如：user_status,sex

@@ -141,6 +141,8 @@ public interface ISysBaseAPI extends CommonAPI {
      */
     public List<SysCategoryModel> queryAllSysCategory();
 
+    List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code, String dataSource);
+
 
     /**
      * 14查询所有部门 作为字典信息 id -->value,departName -->text

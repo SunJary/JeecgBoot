@@ -425,12 +425,16 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 
 	@Override
 	public List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code) {
-		//【Online+系统】字典表加权限控制机制逻辑，想法不错 LOWCOD-799
-		if(tableFilterSql.indexOf(SymbolConstant.SYS_VAR_PREFIX)>=0){
-			tableFilterSql = QueryGenerator.getSqlRuleValue(tableFilterSql);
-		}
-		return sysDictService.queryTableDictItemsByCode(tableFilterSql, text, code);
+        return queryTableDictItemsByCode(tableFilterSql, text, code, null);
 	}
+    @Override
+    public List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code, String dataSource) {
+        //【Online+系统】字典表加权限控制机制逻辑，想法不错 LOWCOD-799
+        if(tableFilterSql.indexOf(SymbolConstant.SYS_VAR_PREFIX)>=0){
+            tableFilterSql = QueryGenerator.getSqlRuleValue(tableFilterSql);
+        }
+        return sysDictService.queryTableDictItemsByCode(tableFilterSql, text, code, dataSource);
+    }
 
 	@Override
 	public List<DictModel> queryAllDepartBackDictModel() {

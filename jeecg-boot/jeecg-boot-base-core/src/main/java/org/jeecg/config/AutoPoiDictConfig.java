@@ -44,6 +44,10 @@ public class AutoPoiDictConfig implements AutoPoiDictServiceI {
 	 */
 	@Override
 	public String[] queryDict(String dicTable, String dicCode, String dicText) {
+        return queryDict(dicTable, dicCode, dicText, null);
+    }
+    @Override
+    public String[] queryDict(String dicTable, String dicCode, String dicText, String ds) {
 		List<String> dictReplaces = new ArrayList<String>();
 		List<DictModel> dictList = null;
 		// step.1 如果没有字典表则使用系统字典表
@@ -52,7 +56,7 @@ public class AutoPoiDictConfig implements AutoPoiDictServiceI {
 		} else {
 			try {
 				dicText = oConvertUtils.getString(dicText, dicCode);
-				dictList = commonApi.queryTableDictItemsByCode(dicTable, dicText, dicCode);
+				dictList = commonApi.queryTableDictItemsByCode(dicTable, dicText, dicCode, ds);
 			} catch (Exception e) {
 				log.error(e.getMessage(),e);
 			}

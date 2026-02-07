@@ -121,6 +121,11 @@ public class SysBaseAPIFallback implements ISysBaseAPI {
     }
 
     @Override
+    public List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code, String dataSource) {
+        return null;
+    }
+
+    @Override
     public List<DictModel> queryAllDepartBackDictModel() {
         return null;
     }

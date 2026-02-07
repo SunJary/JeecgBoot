@@ -231,15 +231,40 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 	@Override
 	@Deprecated
 	public List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code) {
-		log.debug("无缓存dictTableList的时候调用这里！");
+        // 调用带数据源参数的新方法，传递null作为数据源
+        return queryTableDictItemsByCode(tableFilterSql, text, code, null);
+    }
+
+    /**
+     * 通过查询指定table的 text code 获取字典（支持数据源）
+     * @param tableFilterSql 表名(支持where条件)
+     * @param text 显示字段
+     * @param code 编码字段
+     * @param dataSource 数据源（可选）
+     * @return List<DictModel>
+     */
+    @Deprecated
+    @Override
+    public List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code, String dataSource) {
+        log.debug("无缓存dictTableList的时候调用这里！");
 		String str = tableFilterSql+","+text+","+code;
-		// 【QQYUN-6533】表字典白名单check
-		sysBaseAPI.dictTableWhiteListCheckByDict(tableFilterSql, text, code);
-		// 1.表字典黑名单check
-		if(!dictQueryBlackListHandler.isPass(str)){
-			log.error(dictQueryBlackListHandler.getError());
-			return null;
-		}
+
+        //update-begin---author:jarysun ---date:20260206  for：excel注解也增加数据源选项 ------------
+
+        // 是否自定义数据源
+        boolean isCustomDataSource = oConvertUtils.isNotEmpty(dataSource);
+        // 如果是自定义数据源就不检查表字典白名单
+        if (!isCustomDataSource) {
+            // 【QQYUN-6533】表字典白名单check
+            sysBaseAPI.dictTableWhiteListCheckByDict(tableFilterSql, text, code);
+            // 1.表字典黑名单check
+            if (!dictQueryBlackListHandler.isPass(str)) {
+                log.error(dictQueryBlackListHandler.getError());
+                return null;
+            }
+        }
+        //update-end---author:jarysun ---date:20260206  for：excel注解也增加数据源选项 ------------
+
 
 		// 2.分割SQL获取表名和条件
 		String table = null;
@@ -261,9 +286,23 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 		text = SqlInjectionUtil.getSqlInjectField(text);
 		code = SqlInjectionUtil.getSqlInjectField(code);
 		
-		//return sysDictMapper.queryTableDictItemsByCode(tableFilterSql,text,code);
 		table = table.toLowerCase();
-		return sysDictMapper.queryTableDictWithFilter(table,text,code,filterSql);
+
+        // 5.切换数据源查询
+        List<DictModel> restData = null;
+        // 切换为字典表的数据源
+        if (isCustomDataSource) {
+            DynamicDataSourceContextHolder.push(dataSource);
+        }
+        try {
+            restData = sysDictMapper.queryTableDictWithFilter(table, text, code, filterSql);
+        } finally {
+            // 清理自定义的数据源，确保无论是否发生异常都会执行
+            if (isCustomDataSource) {
+                DynamicDataSourceContextHolder.clear();
+            }
+        }
+        return restData;
 	}
 
 	@Override

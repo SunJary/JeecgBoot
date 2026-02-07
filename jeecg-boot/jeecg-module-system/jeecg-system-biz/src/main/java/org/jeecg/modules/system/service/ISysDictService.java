@@ -69,6 +69,9 @@ public interface ISysDictService extends IService<SysDict> {
     @Deprecated
     List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code);
 
+    @Deprecated
+    List<DictModel> queryTableDictItemsByCode(String tableFilterSql, String text, String code, String dataSource);
+
     /**
      * 通过查询指定table的 text code 获取字典（指定查询条件）
      * @param table
